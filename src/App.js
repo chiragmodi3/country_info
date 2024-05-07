@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import PostList from './PostList';
 
-function App() {
+const App = () => {
+  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(0);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get(
+          `https://hn.algolia.com/api/v1/search_by_date?tags=story&page=${page}`
+        );
+        setPosts(response.data.hits);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, [page]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <PostList posts={posts} />
+      <button onClick={() => setPage((prevPage) => prevPage + 1)}>Load More</button>
     </div>
   );
-}
+};
 
 export default App;
